@@ -1,0 +1,13 @@
+Theory
+
+OBJECT SPACE
+ - design all shapes in the scenes through a list of meshes
+ - each shape in a mesh which includes world view coordinates and directions
+ - create a camera object (**IMPLEMENT, allow custom initial camera pos/dir)
+
+WORLD SPACE
+ - iterate over all meshes in their respective object spaces and apply rotation/translation transforms for world space
+
+CAMERA SPACE
+ - by applying the transformations that would move camera to origin and directed at -ve z axis, apply the inverse of this transform to every object for camera space
+ - camera wanted at the center of its space because it simplifies the following transforms that need to be applied
