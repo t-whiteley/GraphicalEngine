@@ -16,7 +16,7 @@ int main() {
     
 
     std::vector<struct Mesh> shapes_in_world;
-    struct Mesh shape1 = build_cube_mesh(5, 2, 1, 0.2, 0.2, 0.2, 15);
+    struct Mesh shape1 = build_cube_mesh(5, 2, -3, 0.2, 0.2, 0.2, 15);
     // struct Mesh shape1 = build_dodecahedron_mesh(6, 2, 5, 0.2, 0.2, 0.2, 15);
     // struct Mesh shape1 = build_octahedron_mesh(6, 2, 5, 0.2, 0.2, 0.2, 15);
     shapes_in_world.push_back(shape1);
@@ -53,9 +53,15 @@ int main() {
         shape1.world_pitch += 0.08;
         // shape1.world_roll += 0.08;
 
+
         C.control_cam(cam_dx, cam_dy, cam_dz, cam_d_pitch, cam_d_yaw);
+
         struct Mesh shape1_world_space = mesh_to_world_space(shape1); // object space -> world space
+        // shape1_world_space.tris[0].nodes[0].print();
+
         struct Mesh shape1_cam_space = C.mesh_to_cam_space(shape1_world_space); // world space -> cam space
+        // shape1_cam_space.tris[0].nodes[0].print();
+
         S.draw_mesh_project(shape1_cam_space); // cam space to canonical view vol.
         S.display();
         S.refresh();
