@@ -10,3 +10,7 @@ Implemented all stages of the graphics engine transformations.
 6. x and y coordinates are obtained in the viewport transform of the canonical viewing volume.
 
 All necessary linear algebra and graphical transformations are self implemented, no external dependencies.
+
+Practical Terms
+* MODEL 5, will run cross platform without any external libraries because it prints frames to the terminal, simple and effective, lightweight graphics and linear algebra function are part of this model.
+* MODEL 6, an implementation that assumes you have a path to the SFML library, the changes are: the function which sets points to the terminal grid, now sets points to a canvas. Also, camera movement is done by the keyboard

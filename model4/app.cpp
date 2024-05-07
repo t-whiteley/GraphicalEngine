@@ -3,23 +3,19 @@
 #include <vector>
 #include <cmath>
 #include <unistd.h>
-#include <ncurses.h>
 #include "libs/LINALG.h"
 #include "libs/GRAPHICS.h"
 #include "libs/SHAPES.h"
 
-// g++ -std=c++11 -o app app.cpp libs/LINALG.cpp libs/GRAPHICS.cpp libs/SHAPES.cpp -lncurses
-
-
+// g++ -std=c++11 -o app app.cpp libs/LINALG.cpp libs/GRAPHICS.cpp libs/SHAPES.cpp
 
 
 int main() {
 
-    // Screen S(450, 120, 2, 9.9, 10);
-    Screen S(175, 70, 6, 10, 100);
+    Screen S(175, 60, 4, 0.1, 1000);
     Camera C;   
 
-    struct Mesh shape1 = build_cube_mesh(0, 0, -4, 0.2, 0.1, 0.2, 50);
+    struct Mesh shape1 = build_cube_mesh(0, 0, 20, 0.2, 0.1, 0.2, 30);
     // struct Mesh shape1 = build_dodecahedron_mesh(6, 2, 5, 0.2, 0.2, 0.2, 15);
     // struct Mesh shape1 = build_octahedron_mesh(6, 2, 5, 0.2, 0.2, 0.2, 15);
 
@@ -37,6 +33,7 @@ int main() {
 
     while (true) {
 
+        // Pan the camera from user input
         std::cout << "Change: \n";
         std::cin >> ch;
         switch (ch) {
@@ -56,12 +53,14 @@ int main() {
             break;
 
 
-
+        // Change the position of an object in space
         shape1.world_yaw += 0.07;
         shape1.world_pitch += 0.08;
-        // shape1.world_roll += 0.08;
+        shape1.world_roll += 0.08;
 
 
+
+        // Perform all the transformations
         C.control_cam(cam_dx, cam_dy, cam_dz, cam_d_pitch, cam_d_yaw);
 
         struct Mesh shape1_world_space = mesh_to_world_space(shape1);
@@ -72,21 +71,10 @@ int main() {
 
         S.draw_mesh(shape1_view_volume_space);
 
-        shape1_cam_space.tris[0].nodes[0].print();
-        shape1_view_volume_space.tris[0].nodes[0].print();
-
-        // S.draw_mesh(shape1_cam_space);
-
-
         S.display();
         S.refresh();
         usleep(40000);
 
-        cam_dx = 0;
-        cam_dy = 0;
-        cam_dz = 0;
-        cam_d_pitch = 0;
-        cam_d_yaw = 0;
-
+        cam_dx = cam_dy = cam_dz = cam_d_pitch = cam_d_yaw = 0;
     }
 }

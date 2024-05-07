@@ -7,6 +7,7 @@
 #include <vector>
 #include <cmath>
 #include <unistd.h>
+#include <SFML/Graphics.hpp>
 #include "LINALG.h"
 
 struct Triangle {
@@ -45,15 +46,15 @@ class Screen {
 
         void display();
 
-        void set_point(float x, float y, float z);
+        void set_point(double x, double y, double z, sf::RenderWindow& window);
 
-        void set_line(float x1, float y1, float z1, float x2, float y2, float z2);
+        void set_line(float x1, float y1, float z1, float x2, float y2, float z2, sf::RenderWindow& window);
         
-        float lerp(float a, float b, float t);
+        double lerp(double a, double b, double t);
 
         struct Mesh mesh_to_view_volume(struct Mesh mesh);
 
-        void draw_mesh(struct Mesh mesh);
+        void draw_mesh(struct Mesh mesh, sf::RenderWindow& window);
 
 
 };

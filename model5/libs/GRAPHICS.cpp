@@ -48,42 +48,34 @@ void Screen::display() {
     std::cout << "\n";
 }
 
-void Screen::set_point(float grid_x, float grid_y, float z) {
+// x, y, z MUST BE ALRADY IN VIEW VOLUME, ONLY SOME VALIDATION IS DONE HERE
+void Screen::set_point(double x, double y, double z) {
 
-    // The conditions define the canonical view, these conditions were used to derive the projection transform
-    // if (x > -1 && x <= 1 && y > -1 && y <= 1 && z > 0 && z <= 1) {
-
-        // int grid_x = static_cast<int>((x + 1) * w / 2);
-        // int grid_y = static_cast<int>((1 - y) * h / 2);
-        int grid_x_int = static_cast<int>(grid_x);
-        int grid_y_int = static_cast<int>(grid_y);
-
+    if (x > -1 && x <= 1 && y > -1 && y <= 1 && z > 0 && z <= 1) {
+        int grid_x_int = static_cast<int>(std::round((x + 1) * w / 2));
+        int grid_y_int = static_cast<int>(std::round((1 - y) * h / 2));
 
         if (grid_x_int < w && grid_x_int >= 0 && grid_y_int < h && grid_y_int >= 0) {
 
-            grid[grid_y][grid_x_int] = 'X';
+            grid[grid_y_int][grid_x_int] = 'X';
 
         }
-            // else {
-                // printf("%f, %f, %f\n", x, y, z);
-            // }
-    // }
+    }
 }
 
+
+// JUST 3D INTERPOLATION, NO SCALING
 void Screen::set_line(float x1, float y1, float z1, float x2, float y2, float z2) {
+    double grid_x1 = x1;
+    double grid_y1 = y1;
+    double grid_x2 = x2;
+    double grid_y2 = y2;
 
-    // these equations derived from canoninocal view x -1,1, y -1,1, z 0,1
-    float grid_x1 = ((x1 + 1) * w / 2);
-    float grid_y1 = ((1 - y1) * h / 2);
-    float grid_x2 = ((x2 + 1) * w / 2);
-    float grid_y2 = ((1 - y2) * h / 2);
-
-
-    if (std::abs(grid_x1 - grid_x2) < std::numeric_limits<float>::epsilon()) {
-        float y = std::min(grid_y1, grid_y2);
+    if (std::abs(grid_x1 - grid_x2) < std::numeric_limits<double>::epsilon()) {
+        double y = std::min(grid_y1, grid_y2);
         while (y <= std::max(grid_y1, grid_y2)) {
             set_point(grid_x1, y, lerp(z1, z2, (y - grid_y1) / (grid_y2 - grid_y1)));
-            y += 1;
+            y += 0.001;
         }
         return;
     }
@@ -94,26 +86,25 @@ void Screen::set_line(float x1, float y1, float z1, float x2, float y2, float z2
     double bias_z = z1 - slope_z * grid_x1;
 
     if (grid_x2 > grid_x1) {
-        float x = grid_x1;
+        double x = grid_x1;
         while (x <= grid_x2) {
-            float y = slope_y * x + bias_y;
-            float z = slope_z * x + bias_z;
+            double y = slope_y * x + bias_y;
+            double z = slope_z * x + bias_z;
             set_point(x, y, z);
-            x += 0.1;
+            x += 0.001;
         }
     } else {
-        float x = grid_x2;
+        double x = grid_x2;
         while (x <= grid_x1) {
-            float y = slope_y * x + bias_y;
-            float z = slope_z * x + bias_z;
+            double y = slope_y * x + bias_y;
+            double z = slope_z * x + bias_z;
             set_point(x, y, z);
-            x += 0.1;
+            x += 0.001;
         }
     }
 }
 
-// linear extrapolation
-float Screen::lerp(float a, float b, float t) {
+double Screen::lerp(double a, double b, double t) {
     return a + t * (b - a);
 }
 
@@ -154,12 +145,12 @@ void Screen::draw_mesh(struct Mesh mesh) {
 
     for (int i = 0; i < mesh.tris.size(); i++) {
         for (int j = 0; j < 3; j++) {
-            int x1 = mesh.tris[i].nodes[j].vals[0][0];
-            int y1 = mesh.tris[i].nodes[j].vals[1][0];
-            int z1 = mesh.tris[i].nodes[j].vals[2][0];
-            int x2 = mesh.tris[i].nodes[(j+1)%3].vals[0][0];
-            int y2 = mesh.tris[i].nodes[(j+1)%3].vals[1][0];
-            int z2 = mesh.tris[i].nodes[(j+1)%3].vals[2][0];
+            float x1 = mesh.tris[i].nodes[j].vals[0][0];
+            float y1 = mesh.tris[i].nodes[j].vals[1][0];
+            float z1 = mesh.tris[i].nodes[j].vals[2][0];
+            float x2 = mesh.tris[i].nodes[(j+1)%3].vals[0][0];
+            float y2 = mesh.tris[i].nodes[(j+1)%3].vals[1][0];
+            float z2 = mesh.tris[i].nodes[(j+1)%3].vals[2][0];
 
             set_line(x1, y1, z1, x2, y2, z2);
         }

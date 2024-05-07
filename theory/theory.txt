@@ -2,8 +2,8 @@ Theory
 
 OBJECT SPACE
  - design all shapes in the scenes through a list of meshes
- - each shape in a mesh which includes world view coordinates and directions
- - create a camera object (**IMPLEMENT, allow custom initial camera pos/dir)
+ - each shape in a mesh / its own coordinate system centered at 0
+ - properties of the mesh are world view coordinates and directions
 
 WORLD SPACE
  - iterate over all meshes in their respective object spaces and apply rotation/translation transforms for world space

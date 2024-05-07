@@ -45,11 +45,11 @@ class Screen {
 
         void display();
 
-        void set_point(float x, float y, float z);
+        void set_point(double x, double y, double z);
 
         void set_line(float x1, float y1, float z1, float x2, float y2, float z2);
         
-        float lerp(float a, float b, float t);
+        double lerp(double a, double b, double t);
 
         struct Mesh mesh_to_view_volume(struct Mesh mesh);
 
