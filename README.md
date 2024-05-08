@@ -11,6 +11,8 @@ Implemented all stages of the graphics engine transformations.
 
 All necessary linear algebra and graphical transformations are self implemented, no external dependencies.
 
-Practical Terms
-* MODEL 5, will run cross platform without any external libraries because it prints frames to the terminal, simple and effective, lightweight graphics and linear algebra function are part of this model.
-* MODEL 6, an implementation that assumes you have a path to the SFML library, the changes are: the function which sets points to the terminal grid, now sets points to a canvas. Also, camera movement is done by the keyboard
+Implementation note:
+* graphicalengine/ is the directory containing the most current model
+* there are two main() implmentations, one for a simple cross platform terminal based, engine
+* and a implementation assuming you have a path to the SFML library to display on uniform canvas rather than ASCII pixels
+* each main has a line which describes how I compile the code, make sure to change the path to SFML library.
