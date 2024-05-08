@@ -11,12 +11,6 @@
 
 // g++ -std=c++11 -o app app_sfml.cpp libs/LINALG.cpp libs/GRAPHICS.cpp libs/SHAPES.cpp -I/opt/homebrew/Cellar/sfml/2.6.1/include -L/opt/homebrew/Cellar/sfml/2.6.1/lib -lsfml-graphics -lsfml-window -lsfml-system -DUSE_SFML
 
-// SET POINT DOES SOME VALIDATION TO MAKE SURE COORDS ARE WITHIN THE CANONICAL, AND THEN SCALES TO THE VIEWPORT
-// BUT THE PERSP. PROJ. TRANSFORM CONVERTS TO CANONICAL COORDS
-// CURRENTLY THE CAMERA CONTROLS MOVE IN THE ABSOLUTE SPACE; I WANT THEM TO MOVE RELATIVE TO THE DIRECTION IT POINTS
-// IMPROVE LIBRARY MANAGEMENT -> MAKE FILE
-// PERFORMANCE / CLEAN UP CODE
-// WEIRD BEHAVIOUR WHEN LINES GO OVER YOUR HEAD
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Graphics Engine");
@@ -30,10 +24,6 @@ int main() {
     struct Mesh shape1_world_space;
     struct Mesh shape1_cam_space;
     struct Mesh shape1_view_volume;
-    struct Mesh shape2_objet_space;
-    struct Mesh shape2_world_space;
-    struct Mesh shape2_cam_space;
-    struct Mesh shape2_view_volume;
     float d_theta = 0.05;
     float theta = 0;
     float pos_scale = 5;
@@ -84,13 +74,8 @@ int main() {
         shape1_world_space = mesh_to_world_space(shape1_objet_space);
         shape1_cam_space = C.mesh_to_cam_space(shape1_world_space);
         shape1_view_volume = S.mesh_to_view_volume(shape1_cam_space);
-        shape2_objet_space = build_cube_mesh(-pos_scale*sin(theta)/2, -pos_scale*cos(theta), -5, theta/3, theta/5, theta/7, 10);
-        shape2_world_space = mesh_to_world_space(shape2_objet_space);
-        shape2_cam_space = C.mesh_to_cam_space(shape2_world_space);
-        shape2_view_volume = S.mesh_to_view_volume(shape2_cam_space);
 
         S.draw_mesh_SFML(shape1_view_volume, window);
-        S.draw_mesh_SFML(shape2_view_volume, window);
         window.display();
         window.clear();
         cam_dx = cam_dy = cam_dz = cam_d_pitch = cam_d_yaw = 0;
