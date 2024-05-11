@@ -5,24 +5,33 @@
 #include <unistd.h>
 #include "libs/LINALG.h"
 #include "libs/GRAPHICS.h"
+#include "libs/SHAPES.h"
 
 
-// g++ -std=c++11 -o app app_terminal.cpp libs/LINALG.cpp libs/GRAPHICS.cpp
-
+// g++ -std=c++11 -o app app_terminal.cpp libs/LINALG.cpp libs/GRAPHICS.cpp libs/SHAPES.cpp
 
 int main() {
     Screen S(175, 60, 2, 0.1, 1000);
     Camera C;
 
-    struct Mesh m1_obj_space = build_cube_mesh(0, 0, -3, 0, 0, 0, 1);
-    struct Mesh m1_world_space = build_dummy_mesh(m1_obj_space);
-    struct Mesh m1_cam_space = build_dummy_mesh(m1_obj_space);
-    struct Mesh m1_viewvol_space = build_dummy_mesh(m1_obj_space);
-
-    char ch;
     float d_theta = 0.05;
-    float cam_dx = 0, cam_dy = 0, cam_dz = 0, cam_d_pitch = 0, cam_d_yaw = 0;
-    float rotation_rate = 0.1, displacement_rate = 0.1;
+    float theta = 0;
+
+    struct Mesh shape1_objet_space;
+    struct Mesh shape1_world_space;
+    struct Mesh shape1_cam_space;
+    struct Mesh shape1_view_volume;
+
+    // Initial cam settings
+    float cam_dx = 0;
+    float cam_dy = 0;
+    float cam_dz = 0;
+    float cam_d_pitch = 0;
+    float cam_d_yaw = 0;
+    char ch;
+    float rotation_rate = 0.1;
+    float displacement_rate = 0.1;
+
 
     while (true) {
 
@@ -45,24 +54,22 @@ int main() {
         // if (ch == 'q')
         //     break;
 
+
+        theta += d_theta;
         C.control_cam(cam_dx, cam_dy, -cam_dz, cam_d_pitch, cam_d_yaw);
-        transform_mesh(0, 0, 0, d_theta, d_theta/2, 0, 0, m1_obj_space);
-        mesh_to_world_space(m1_obj_space, m1_world_space);
-        C.mesh_to_cam_space(m1_world_space, m1_cam_space);
-        S.mesh_to_view_volume(m1_cam_space, m1_viewvol_space);
+        shape1_objet_space = build_cube_mesh(0, 0, -2.5, theta, theta/2, 0, 0.5);
+        shape1_world_space = mesh_to_world_space(shape1_objet_space);
+        shape1_cam_space = C.mesh_to_cam_space(shape1_world_space);
+        shape1_view_volume = S.mesh_to_view_volume(shape1_cam_space);
 
-
-        S.draw_mesh_Terminal(m1_viewvol_space);
+        S.draw_mesh_Terminal(shape1_view_volume);
         S.display();
         S.refresh();
 
-
-        cam_dx = cam_dy = cam_dz = cam_d_pitch = cam_d_yaw = 0;
         float dt = (1.0f / 60) * 1000000; // 60 fps
         usleep(dt*2);
+
+        cam_dx = cam_dy = cam_dz = cam_d_pitch = cam_d_yaw = 0;
     }
-
-
-
 
 }

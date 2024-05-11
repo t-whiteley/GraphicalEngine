@@ -1,13 +1,16 @@
 #include "LINALG.h"
+#include <assert.h>
+
 
 Matrix::Matrix(int h, int w) {
     y = h;
     x = w;
-
     for (int i = 0; i < y; i++) {
+        std::vector<double> temp;
         for (int j = 0; j < x; j++) {
-            vals[i][j] = 0.0; // Initialize all elements to 0
+            temp.push_back(0);
         }
+        vals.push_back(temp);
     }
 }
 
@@ -24,6 +27,23 @@ void Matrix::print() {
 }
 
 
+Matrix Matrix::multiply(Matrix n) {
+    assert(x == n.y);
+
+    Matrix f(y, n.x);
+    for (int i = 0; i < f.y; i++) {
+        for (int j = 0; j < f.x; j++) {
+
+            float num = 0;
+            for (int k = 0; k < x; k++) {
+                num += vals[i][k] * n.vals[k][j];
+            }
+            f.vals[i][j] = num;
+        }
+    }
+    return f;
+}
+
 void Matrix::fill(float num) {
     for (int i = 0; i < y; i++) {
         for (int j = 0; j < x; j++) {
@@ -33,18 +53,59 @@ void Matrix::fill(float num) {
 }
 
 
-void Matrix::normalize() {
-    float mag = 0.0;
-    for (int i = 0; i < y; ++i) {
-        for (int j = 0; j < x; ++j) {
-            mag += vals[i][j] * vals[i][j];
+Matrix Matrix::cross_product3(Matrix vector1) {
+    assert(y == 3 && x == 1 && vector1.y == 3 && vector1.x == 1);
+
+    Matrix result(3, 1);
+    result.vals[0][0] = vals[1][0] * vector1.vals[2][0] - vals[2][0] * vector1.vals[1][0];
+    result.vals[1][0] = vals[2][0] * vector1.vals[0][0] - vals[0][0] * vector1.vals[2][0];
+    result.vals[2][0] = vals[0][0] * vector1.vals[1][0] - vals[1][0] * vector1.vals[0][0];
+    return result;
+}
+
+Matrix Matrix::transpose() {
+    Matrix result(x, y);
+    for (int i = 0; i < y; i++) {
+        for (int j = 0; j < x; j++) {
+            result.vals[j][i] = vals[i][j];
         }
     }
-    mag = std::sqrt(mag);
-    if (mag != 0) {
+    return result;
+}
+
+
+Matrix Matrix::Vector3_toHG() {
+    assert(y==3 && x==1);
+    Matrix homog(4, 1);
+    homog.vals[0][0] = vals[0][0];
+    homog.vals[1][0] = vals[1][0];
+    homog.vals[2][0] = vals[2][0];
+    homog.vals[3][0] = 1;
+    return homog;
+}
+
+Matrix Matrix::HG_toVector3() {
+    assert(y==4 && x==1);
+    Matrix vec3(3, 1);
+    vec3.vals[0][0] = vals[0][0];
+    vec3.vals[1][0] = vals[1][0];
+    vec3.vals[2][0] = vals[2][0];
+    return vec3;
+}
+
+
+void Matrix::normalize() {
+    double magnitude = 0.0;
+    for (int i = 0; i < y; ++i) {
+        for (int j = 0; j < x; ++j) {
+            magnitude += vals[i][j] * vals[i][j];
+        }
+    }
+    magnitude = std::sqrt(magnitude);
+    if (magnitude != 0) {
         for (int i = 0; i < y; ++i) {
             for (int j = 0; j < x; ++j) {
-                vals[i][j] /= mag;
+                vals[i][j] /= magnitude;
             }
         }
     }
@@ -61,70 +122,6 @@ void Matrix::scale(float n) {
 }
 
 
-void Matrix::multiply(Matrix& n, Matrix& dest) {
-    assert(x == n.y);
-    assert(dest.y == x);
-    assert(dest.x == n.x);
-
-    for (int i = 0; i < dest.y; i++) {
-        for (int j = 0; j < dest.x; j++) {
-
-            float num = 0;
-            for (int k = 0; k < x; k++) {
-                num += vals[i][k] * n.vals[k][j];
-            }
-            dest.vals[i][j] = num;
-        }
-    }
-}
-
-
-void Matrix::cross_product3(Matrix& vector1, Matrix& dest) {
-    assert(y == 3 && x == 1 && vector1.y == 3 && vector1.x == 1);
-    assert(dest.y == 3 && dest.x == 1);
-
-    dest.vals[0][0] = vals[1][0] * vector1.vals[2][0] - vals[2][0] * vector1.vals[1][0];
-    dest.vals[1][0] = vals[2][0] * vector1.vals[0][0] - vals[0][0] * vector1.vals[2][0];
-    dest.vals[2][0] = vals[0][0] * vector1.vals[1][0] - vals[1][0] * vector1.vals[0][0];
-}
-
-
-void Matrix::transpose(Matrix& dest) {
-    assert(dest.x == x && dest.y == y);
-
-    for (int i = 0; i < y; i++) {
-        for (int j = 0; j < x; j++) {
-            dest.vals[j][i] = vals[i][j];
-        }
-    }
-}
-
-
-void Matrix::Vector3_toHG(Matrix& dest) {
-    assert(y==3 && x==1);
-    assert(dest.y==4 && dest.x==1);
-
-    dest.vals[0][0] = vals[0][0];
-    dest.vals[1][0] = vals[1][0];
-    dest.vals[2][0] = vals[2][0];
-    dest.vals[3][0] = 1;
-}
-
-void Matrix::HG_toVector3(Matrix& dest) {
-    assert(y==4 && x==1);
-    assert(dest.y == 3 && dest.x == 1);
-
-    dest.vals[0][0] = vals[0][0];
-    dest.vals[1][0] = vals[1][0];
-    dest.vals[2][0] = vals[2][0];
-
-    if (vals[3][0] != 0) {
-        dest.scale(1/vals[3][0]);
-    }
-}
-
-
-
 Matrix Vector3(float x, float y, float z) {
     Matrix m(3, 1);
     m.vals[0][0] = x;
@@ -132,6 +129,7 @@ Matrix Vector3(float x, float y, float z) {
     m.vals[2][0] = z;
     return m;
 }
+
 Matrix RotX(float d_theta) {
     float cosTheta = cos(d_theta);
     float sinTheta = sin(d_theta);
